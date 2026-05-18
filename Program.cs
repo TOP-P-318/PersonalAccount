@@ -39,6 +39,8 @@ namespace PersonalAccount
             builder.Services.AddScoped<IMapper<StudentEntity, StudentAuthModel>, StudentAuthMapper>();
             builder.Services.AddScoped<IMapper<StudentEntity, StudentModel>, StudentMapper>();
 
+            // asldjasjhdj
+            
             if (builder.Environment.IsDevelopment())
                 builder.Services.AddScoped<DbSeeder>();
 
