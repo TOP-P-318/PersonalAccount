@@ -1,11 +1,38 @@
-﻿using PersonalAccount.Models;
-using PersonalAccount.Repository;
-using PersonalAccount.Types;
+﻿using ДЗ_на_25_мая_Тимур_Жуков.Models;
+using ДЗ_на_25_мая_Тимур_Жуков.Repositories;
 
-namespace PersonalAccount.Services.Cabinet;
+namespace ДЗ_на_25_мая_Тимур_Жуков.Services.Cabinet;
 
-public class AdminCabinetService(IStudentProfileRepo studentProfiles, IAccountRepo accounts) : IAdminCabinetService
+public class AdminCabinetService : IAdminCabinetService
 {
-    public async Task<Dictionary<int, AccountModel>> GetAllStudentAccountsAsync() => (await accounts.GetByRoleAsync(AccountRole.Student)).ToDictionary(account => account.Id);
-    public async Task<List<StudentProfileModel>> GetAllStudentProfilesAsync() => await studentProfiles.GetAllAsync();
+    private readonly IAccountRepo _accountRepo;
+    private readonly IStudentProfileRepo _studentProfileRepo;
+
+    public AdminCabinetService(IAccountRepo accountRepo, IStudentProfileRepo studentProfileRepo)
+    {
+        _accountRepo = accountRepo;
+        _studentProfileRepo = studentProfileRepo;
+    }
+
+    public async Task<Dictionary<int, AccountModel>> GetAllStudentAccountsAsync()
+    {
+        var accounts = await _accountRepo.GetByRoleAsync(AccountRole.Student);
+        return accounts.ToDictionary(a => a.Id);
+    }
+
+    public async Task<List<StudentProfileModel>> GetAllStudentProfilesAsync()
+    {
+        return await _studentProfileRepo.GetAllAsync();
+    }
+
+    public async Task ConfirmStudentEmailAsync(int accountId)
+    {
+        await Task.CompletedTask;
+    }
+
+    public bool IsEmailConfirmed(int accountId)
+    {
+        
+        return true;
+    }
 }

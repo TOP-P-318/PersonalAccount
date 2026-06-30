@@ -1,11 +1,10 @@
-﻿using PersonalAccount.Types;
-
-namespace PersonalAccount.Models;
-
-public class AccountModel
+﻿namespace ДЗ_на_25_мая_Тимур_Жуков.Models
 {
-    public int Id { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
-    public AccountRole Role { get; set; } = AccountRole.Student;
+    public class AccountModel
+    {
+        public int Id { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public AccountRole Role { get; set; } = AccountRole.Admin;
+    }
 }

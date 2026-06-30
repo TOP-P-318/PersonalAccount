@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Регистрация";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Регистрация</h2>
+
+            <div class="card shadow">
+                <div class="card-body p-4">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form action="/Account/Register" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input name="Email" type="email" class="form-control" placeholder="student@test.com" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Пароль</label>
+                            <input name="Password" type="password" class="form-control" placeholder="Минимум 6 символов" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ФИО</label>
+                            <input name="FullName" type="text" class="form-control" placeholder="Иванов Иван Иванович" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Группа</label>
+                            <input name="GroupName" type="text" class="form-control" placeholder="П-318" />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 mb-3">Зарегистрироваться</button>
+                    </form>
+
+                    <div class="text-center">
+                        <a href="/Account/Login" class="text-decoration-none">Уже есть аккаунт? Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

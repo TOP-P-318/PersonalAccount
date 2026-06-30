@@ -1,12 +1,13 @@
-﻿namespace PersonalAccount.Data.Entities;
-
-public class StudentProfileEntity
+﻿namespace ДЗ_на_25_мая_Тимур_Жуков.Data.Entities
 {
-    public int Id { get; set; }
-    public int AccountId { get; set; }
-    public AccountEntity? Account { get; set; }
-    
-    public string FullName { get; set; } = string.Empty;
-    public string GroupName { get; set; } = string.Empty;
-    public string? PhotoUrl { get; set; }
+    public class StudentProfileEntity
+    {
+        public int Id { get; set; }
+        public int AccountId { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string GroupName { get; set; } = string.Empty;
+        public string? PhotoUrl { get; set; }
+
+        public AccountEntity? Account { get; set; }
+    }
 }

@@ -1,82 +1,74 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PersonalAccount.Models.ViewModels;
-using PersonalAccount.Services.Auth;
-using PersonalAccount.Services.Cabinet;
-using PersonalAccount.Types;
-using PersonalAccount.Utils;
+using ДЗ_на_25_мая_Тимур_Жуков.Models;
+using ДЗ_на_25_мая_Тимур_Жуков.Services.Cabinet;
+using ДЗ_на_25_мая_Тимур_Жуков.ViewModels;
 
-namespace PersonalAccount.Controllers;
+namespace ДЗ_на_25_мая_Тимур_Жуков.Controllers;
 
 [Authorize]
-public class CabinetController(
-    IStudentCabinetService studentCabinet,
-    IAdminCabinetService adminCabinet,
-    IConfirmationTokenService confirmations) : Controller
+public class CabinetController : Controller
 {
-    [HttpGet]
-    public async Task<IActionResult> Index()
+    private readonly IAdminCabinetService _adminCabinetService;
+
+    public CabinetController(IAdminCabinetService adminCabinetService)
     {
-        var accountId = User.GetId();
-        var role = User.GetRole();
+        _adminCabinetService = adminCabinetService;
+    }
 
-        if (accountId == null || role == null)
-            return RedirectToAction("Error", "Home");
+    [HttpGet]
+    public IActionResult Index()
+    {
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        switch (role)
+        if (role == "Admin")
+            return RedirectToAction("Admin");
+
+        if (role == "Student")
+            return RedirectToAction("Student");
+
+        return RedirectToAction("Login", "Account");
+    }
+
+    [HttpGet]
+    public IActionResult Student()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Admin()
+    {
+        try
         {
-            case AccountRole.Student:
-                return RedirectToAction("Student", new { accountId, role });
-            case AccountRole.Administrator:
-                return RedirectToAction("Admin", new { accountId, role });
-            case AccountRole.Teacher:
-            default:
-                return RedirectToAction("Error", "Home");
+            var accounts = await _adminCabinetService.GetAllStudentAccountsAsync();
+            var profiles = await _adminCabinetService.GetAllStudentProfilesAsync();
+
+            var students = profiles.Select(profile => new AdminCabinetStudentViewModel
+            {
+                AccountId = profile.AccountId,
+                FullName = profile.FullName,
+                GroupName = profile.GroupName,
+                PhotoUrl = profile.PhotoUrl,
+                IsEmailConfirmed = _adminCabinetService.IsEmailConfirmed(profile.AccountId)
+            }).ToList();
+
+            return View(new AdminCabinetViewModel { Students = students });
+        }
+        catch
+        {
+            return View(new AdminCabinetViewModel { Students = new List<AdminCabinetStudentViewModel>() });
         }
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Student(int accountId, AccountRole role)
+    [HttpPost]
+    [Authorize]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmStudentEmail(int id)
     {
-        var accountEmail = User.GetEmail();
-        if (accountEmail is null || role != AccountRole.Student)
-            return RedirectToAction("Error", "Home");
-
-        var student = await studentCabinet.GetStudentAsync(accountId);
-        if (student is null) return RedirectToAction("Error", "Home");
-
-        var isEmailConfirmed = await confirmations.HasConfirmedTokensAsync(student.Id);
-
-        return View(new StudentCabinetViewModel
-        {
-            Email = accountEmail,
-            GroupName = student.GroupName,
-            FullName = student.FullName,
-            IsEmailConfirmed = isEmailConfirmed,
-            PhotoUrl = student.PhotoUrl?.ToString(),
-        });
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Admin(int accountId, AccountRole role)
-    {
-        if (role != AccountRole.Administrator)
-            return RedirectToAction("Error", "Home");
-
-        var accounts = await adminCabinet.GetAllStudentAccountsAsync();
-        var profiles = await adminCabinet.GetAllStudentProfilesAsync();
-
-        var studentInfos = profiles.Select(profile => new StudentInfoViewModel
-        {
-            Email = accounts[profile.AccountId].Email,
-            FullName = profile.FullName,
-            GroupName = profile.GroupName,
-            PhotoUrl = profile.PhotoUrl?.ToString(),
-        }).ToList();
-
-        return View(new AdminCabinetViewModel
-        {
-            StudentInfos = studentInfos
-        });
+        await _adminCabinetService.ConfirmStudentEmailAsync(id);
+        return RedirectToAction("Admin");
     }
 }

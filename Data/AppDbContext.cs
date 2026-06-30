@@ -1,101 +1,37 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PersonalAccount.Data.Entities;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using ДЗ_на_25_мая_Тимур_Жуков.Data.Entities;
 
-namespace PersonalAccount.Data;
-
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+namespace ДЗ_на_25_мая_Тимур_Жуков.Data
 {
-    public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
-    public DbSet<StudentProfileEntity> StudentProfiles => Set<StudentProfileEntity>();
-    public DbSet<ConfirmationTokenEntity> ConfirmationTokens => Set<ConfirmationTokenEntity>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class AppDbContext : DbContext
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<AccountEntity>(entity =>
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        public DbSet<AccountEntity> Accounts => Set<AccountEntity>();
+        public DbSet<StudentProfileEntity> StudentProfiles => Set<StudentProfileEntity>();
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            entity.ToTable("accounts");
-            entity.HasKey(account => account.Id);
-            
-            entity.Property(account => account.Id)
-                .HasColumnName("id")
-                .ValueGeneratedOnAdd();
-            
-            entity.Property(account => account.Email)
-                .HasColumnName("email")
-                .HasMaxLength(255)
-                .IsRequired();
-            
-            entity.Property(account => account.PasswordHash)
-                .HasColumnName("password_hash")
-                .IsRequired();
+            modelBuilder.Entity<AccountEntity>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(256);
+                entity.Property(e => e.PasswordHash).IsRequired();
+                entity.Property(e => e.Role).IsRequired();
+                entity.HasIndex(e => e.Email).IsUnique();
+            });
+            modelBuilder.Entity<StudentProfileEntity>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FullName).IsRequired().HasMaxLength(256);
+                entity.Property(e => e.GroupName).IsRequired().HasMaxLength(64);
+                entity.HasOne(e => e.Account)
+                      .WithMany()
+                      .HasForeignKey(e => e.AccountId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
 
-            entity.Property(account => account.Role)
-                .HasColumnName("role")
-                .IsRequired();
-        });
-        
-        modelBuilder.Entity<StudentProfileEntity>(entity =>
-        {
-            entity.ToTable("student_profiles");
-            entity.HasKey(student => student.Id);
-
-            entity.Property(student => student.Id)
-                .HasColumnName("id")
-                .ValueGeneratedOnAdd();
-
-            entity.Property(student => student.FullName)
-                .HasColumnName("full_name")
-                .HasMaxLength(255)
-                .IsRequired();
-
-            entity.Property(student => student.GroupName)
-                .HasColumnName("group_name")
-                .HasMaxLength(255)
-                .IsRequired();
-
-            entity.Property(student => student.PhotoUrl)
-                .HasColumnName("photo_url")
-                .HasMaxLength(2047);
-
-            entity.Property(student => student.AccountId)
-                .HasColumnName("account_id")
-                .IsRequired();
-            entity.HasOne(student => student.Account)
-                .WithOne(account => account.StudentProfile)
-                .HasForeignKey<StudentProfileEntity>(student => student.AccountId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-        });
-
-        modelBuilder.Entity<ConfirmationTokenEntity>(entity =>
-        {
-            entity.ToTable("confirmation_tokens");
-            entity.HasKey(token => token.Id);
-
-            entity.Property(token => token.Id)
-                .HasColumnName("id")
-                .ValueGeneratedOnAdd();
-
-            entity.Property(token => token.AccountId)
-                .HasColumnName("account_id")
-                .IsRequired();
-
-            entity.Property(token => token.TokenHash)
-                .HasColumnName("token_hash")
-                .IsRequired();
-
-            entity.Property(token => token.ExpiresAt)
-                .HasColumnName("expires_at")
-                .IsRequired();
-
-            entity.Property(token => token.ConfirmedAt)
-                .HasColumnName("confirmed_at");
-
-            entity.HasOne(token => token.Account)
-                .WithMany(student => student.ConfirmationTokens)
-                .HasForeignKey(token => token.AccountId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
     }
-}
+   }
