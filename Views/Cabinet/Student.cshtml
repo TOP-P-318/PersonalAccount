@@ -1,40 +1,13 @@
-﻿@model StudentCabinetViewModel
-
-@{
-    ViewData["Title"] = "Личный кабинет";
+﻿@{
+    ViewData["Title"] = "Кабинет студента";
+    Layout = "_Layout";
 }
 
-<div class="container">
-    <div class="d-flex justify-content-between align-content-center">
-        <h1 class="mb-4">Личный кабинет студента</h1>
+<div class="container mt-4">
+    <h2>Добро пожаловать, студент!</h2>
+    <p>Это ваш личный кабинет.</p>
 
-    </div>
-
-    <div class="card w-50">
-        @if (Model.PhotoUrl != null)
-        {
-            <img class="card-img-top" src="@Model.PhotoUrl" alt="Фото студента"/>
-        }
-        <header class="card-header">
-            @Model.FullName
-        </header>
-
-        <div class="card-body">
-            <p class="mb-1">
-                Группа: @Model.GroupName
-            </p>
-
-            <form class="d-flex gap-2 align-items-center" method="post" asp-controller="EmailConfirmation"
-                  asp-action="SendEmailConfirmation">
-                <span class="@(Model.IsEmailConfirmed ? "text-success" : "")">
-                    @Model.Email
-                </span>
-                @if (!Model.IsEmailConfirmed)
-                {
-                    <button class="btn btn-link nav-link text-danger" type="submit">Подтвердить</button>
-                }
-            </form>
-
-        </div>
-    </div>
+    <form action="/Account/Logout" method="post">
+        <button type="submit" class="btn btn-outline-danger mt-3">Выйти</button>
+    </form>
 </div>

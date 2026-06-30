@@ -1,9 +1,12 @@
-﻿using PersonalAccount.Models;
+﻿using ДЗ_на_25_мая_Тимур_Жуков.Models;
 
-namespace PersonalAccount.Services.Cabinet;
-
-public interface IAdminCabinetService
+namespace ДЗ_на_25_мая_Тимур_Жуков.Services.Cabinet
 {
-    Task<Dictionary<int, AccountModel>> GetAllStudentAccountsAsync();
-    Task<List<StudentProfileModel>> GetAllStudentProfilesAsync();
+    public interface IAdminCabinetService
+    {
+        Task<Dictionary<int, AccountModel>> GetAllStudentAccountsAsync();
+        Task<List<StudentProfileModel>> GetAllStudentProfilesAsync();
+        bool IsEmailConfirmed(int accountId);
+        Task ConfirmStudentEmailAsync(int accountId);
+    }
 }

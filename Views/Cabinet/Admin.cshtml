@@ -1,36 +1,72 @@
-﻿@model AdminCabinetViewModel
-
+﻿@model ДЗ_на_25_мая_Тимур_Жуков.ViewModels.AdminCabinetViewModel
 @{
-    ViewData["Title"] = "Панель администратора";
+    ViewData["Title"] = "Кабинет администратора";
+    Layout = "_Layout";
 }
 
-<div class="container">
-    <div class="d-flex justify-content-between align-content-center">
-        <h1 class="mb-4">Панель администратора</h1>
-    </div>
+<div class="container mt-4">
+    <h2>Кабинет администратора</h2>
+    <p class="text-muted">Список студентов и управление подтверждением почты</p>
 
-    <div class="container d-flex flex-wrap gap-4">
-        @foreach (var studentInfo in Model.StudentInfos)
-        {
-            <div class="card" style="width: 400px">
-                <div class="gap-2 d-grid align-items-stretch" style="grid-template-columns: repeat(2, 1fr)">
-                    <div class="w-100 h-100"
-                         style="background-image: url(@studentInfo.PhotoUrl); background-size: cover">
+    @if (Model?.Students == null || Model.Students.Count == 0)
+    {
+        <div class="alert alert-info mt-3">Студентов пока нет</div>
+    }
+    else
+    {
+        <table class="table table-striped table-hover mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Фото</th>
+                    <th>ФИО</th>
+                    <th>Группа</th>
+                    <th>Статус почты</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model.Students)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(student.PhotoUrl))
+                            {
+                                <img src="@student.PhotoUrl" alt="Фото" width="60" class="rounded" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">Нет фото</span>
+                            }
+                        </td>
+                        <td>@student.FullName</td>
+                        <td>@student.GroupName</td>
+                        <td>
+                            @if (student.IsEmailConfirmed)
+                            {
+                                <span class="badge bg-success">✓ Почта подтверждена</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">⚠ Не подтверждена</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!student.IsEmailConfirmed)
+                            {
+                                <form asp-action="ConfirmStudentEmail" asp-route-id="@student.AccountId" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-primary btn-sm">Подтвердить почту</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
-                    </div>
-                    <div class="d-flex flex-column gap-2 w-100 h-100">
-                        <p class="card-header">
-                            @studentInfo.FullName
-                        </p>
-                        <p class="mb-1">
-                            Группа: @studentInfo.GroupName
-                        </p>
-                        <p>
-                            @studentInfo.Email
-                        </p>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+    <form asp-controller="Account" asp-action="Logout" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-danger">Выйти</button>
+    </form>
 </div>

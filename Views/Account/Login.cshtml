@@ -1,38 +1,41 @@
-﻿@model LoginViewModel
+﻿@model ДЗ_на_25_мая_Тимур_Жуков.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Вход";
+    Layout = "_Layout";
 }
 
-<div class="container d-flex align-content-center justify-content-center">
-    <div class="card w-50">
-        <header class="card-header">
-            <h1 class="text-center">
-                Личный кабинет
-            </h1>
-        </header>
-        <form class="card-body" method="post" asp-action="Login" asp-controller="Account">
-            <p class="text-center">Войдите под своей учетной записью</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h2 class="text-center mb-4">Вход в систему</h2>
 
-            <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
-            
-            
-            <div class="mb-3">
-                <label class="form-label" asp-for="Email"></label>
-                <input class="form-control" asp-for="Email" autocomplete="off"/>
-                <span class="text-danger small" asp-validation-for="Email"></span>
+            <div class="card shadow">
+                <div class="card-body p-4">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form action="/Account/Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input name="Email" type="email" class="form-control" value="@Model?.Email" placeholder="admin@test.com" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Пароль</label>
+                            <input name="Password" type="password" class="form-control" placeholder="Пароль" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Войти</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="/Account/Register">Нет аккаунта? Зарегистрироваться</a>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label"  asp-for="Password"></label>
-                <input class="form-control" asp-for="Password"/>
-                <span class="text-danger small" asp-validation-for="Password"></span>
-            </div>
-
-            <input type="hidden" asp-for="ReturnUrl"/>
-            <button class="btn btn-primary w-100" type="submit">Войти</button>
-
-        </form>
+        </div>
     </div>
 </div>
-
-
